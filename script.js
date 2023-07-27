@@ -26,7 +26,7 @@ function operate (firstOperande, secondOperande, operator) {
             if (secondOperande) {
                 return divide(firstOperande, secondOperande);
             } else {
-                return "Divide by 0 ?";
+                return "Divide by 0";
             }
     }
 }
@@ -44,25 +44,43 @@ const selectedNumberNode = numberContainer.querySelectorAll("button");
 let firstSelectedNumber = "";
 let secondSelectedNumber = "";
 let selectedOperator = "";
+let lastResult = "";
 
 selectedNumberNode.forEach((button) => {
     button.addEventListener('click', () => {
-        (!firstSelectedNumber && !selectedOperator) ? resultDisplay.textContent = (firstSelectedNumber += button.id) :
-        (firstSelectedNumber && selectedOperator) ? resultDisplay.textContent += (secondSelectedNumber += button.id):
-        resultDisplay.textContent = "";
+        if (!selectedOperator) {
+            resultDisplay.textContent = (firstSelectedNumber += button.id);
+        } else if (selectedOperator) {
+            resultDisplay.textContent = (secondSelectedNumber += button.id);
+        }
     })
 })
 
 operators.forEach((button) => {
     button.addEventListener('click', () => {
-        (button.id != "AC" && button.id != "=" && !selectedOperator) ? resultDisplay.textContent += (selectedOperator = button.id) :
-        (button.id === "AC") ? function() {
-            firstSelectedNumber, secondSelectedNumber, selectedOperator =  "";
-            resultDisplay.textContent =  " "
-        }:
-        (button.id === "=" && secondSelectedNumber && selectedOperator) ? 
-            resultDisplay.textContent =  operate(firstSelectedNumber, secondSelectedNumber, selectedOperator):
-        result = "pas fini batar"
+        if (button.id != "AC" && button.id != "=" && !selectedOperator) {
+            resultDisplay.textContent = (selectedOperator = button.id)
+            lastResult = "";
+        } else if (button.id === "AC") {
+            firstSelectedNumber = "";
+            secondSelectedNumber = ""; 
+            selectedOperator = "";
+            lastResult = "";
+            resultDisplay.textContent =  "";
+        } else if (button.id === "=" && secondSelectedNumber && selectedOperator) {
+            resultDisplay.textContent =  operate(firstSelectedNumber, secondSelectedNumber, selectedOperator)
+        } else if (button.id != "AC" && button.id != "=" && selectedOperator) {
+            console.log(firstSelectedNumber, secondSelectedNumber, selectedOperator);
+            lastResult = operate(firstSelectedNumber, secondSelectedNumber, selectedOperator);
+            console.log(`last result = ${lastResult}`);
+            resultDisplay.textContent = lastResult;
+            selectedOperator = button.id;
+            firstSelectedNumber = lastResult;
+            secondSelectedNumber = "";
+        } else if (button.id == "=" && lastResult) {
+            console.log(`last result = ${lastResult}, firstSelectedNumber = ${firstSelectedNumber}, secondSelectedNumber = ${secondSelectedNumber}`)
+            resultDisplay.textContent = operate(lastResult, secondSelectedNumber, selectedOperator);
+        }
         }
     )
 })
